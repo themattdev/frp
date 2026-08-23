@@ -3,5 +3,6 @@ node_modules/
 *.sqlite
 *.sqlite3
 *.db
-CLAUDE.md
+*.md
 *.code-workspace
+.claude/
