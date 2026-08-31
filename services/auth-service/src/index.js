@@ -11,9 +11,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = process.env.PORT;
+const publicPath = process.env.PUBLIC_PATH;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
+app.locals.publicPath = publicPath;
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 app.use(express.json());
@@ -62,7 +64,7 @@ app.post("/login", async (req, res) => {
             path: "/"
         });
 
-        return res.redirect("/");
+        return res.redirect(publicPath);
     }
     // Password is not correct
     else {
@@ -74,7 +76,7 @@ app.post("/login", async (req, res) => {
 // Logout
 app.post("/logout", (req, res) => {
     res.clearCookie("token", { path: "/" });
-    res.redirect("/login");
+    res.redirect(`${publicPath}/login`);
 });
 
 
@@ -83,15 +85,15 @@ app.get("/", (req, res) => {
 
     const token = req.cookies.token;
 
-    if (!token) 
-        return res.redirect("/login");
+    if (!token)
+        return res.redirect(`${publicPath}/login`);
 
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
         const user = db.prepare("SELECT username FROM users WHERE id = ?").get(payload.userId);
         res.render("dashboard", { username: user.username });
     } catch (err) {
-        res.redirect("/login");
+        res.redirect(`${publicPath}/login`);
     }
 });
 
